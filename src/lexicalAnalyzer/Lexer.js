@@ -57,7 +57,11 @@ class Lexer {
             return { type: 'IntegerLiteral', class: 'INTEGER' };
         } else if (this.literal.isFloatingPointLiteral(lexeme)) {
             return { type: 'FloatingPointLiteral', class: 'FLOATING_POINT' };
-        } else if (this.literal.isStringLiteral(lexeme)) {
+        }
+        else if(this.literal.isBoolLiteral(lexeme)){
+            return{type: "booleanLiteral",class:'BOOLEAN'}
+        }
+         else if (this.literal.isStringLiteral(lexeme)) {
             return { type: 'StringLiteral', class: 'STRING' };
         } else if (this.wordBreaker.isVariable(lexeme)) {
             return { type: 'Variable' , class: 'VARIABLE'};

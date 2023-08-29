@@ -42,22 +42,37 @@ class WordBreaker {
         return /^[a-zA-Z_]\w*$/.test(lexeme);
     }
 
+
     splitCode(code) {
         const lexemes = [];
         let currentLexeme = '';
         let inString = false;
-    
+        let inMultilineComment = false;
+        
         for (let i = 0; i < code.length; i++) {
             const char = code[i];
     
             if (char === '"' && (i === 0 || code[i - 1] !== '\\')) {
                 inString = !inString;
             }
+            
+            if (inMultilineComment) {
+                if (char === '*' && code[i + 1] === '/') {
+                    inMultilineComment = false;
+                    i++; // Skip the '*' character
+                }
+                continue; // Skip characters within multiline comment
+            } else if (char === '/' && code[i + 1] === '*') {
+                inMultilineComment = true;
+                i++; // Skip the '*' character
+                continue; // Skip the opening of multiline comment
+            }
     
             if (inString) {
                 currentLexeme += char;
                 continue;
             }
+    
             if (char === '/' && code[i + 1] === '/') {
                 // Handle "//" comment
                 while (i < code.length && code[i] !== '\n') {
@@ -65,75 +80,16 @@ class WordBreaker {
                 }
                 // No need to add anything to lexemes for comments
             }
+            
+            // Rest of the code remains unchanged
+            // ...
     
-            if (this.operatorMappings[char]) {
-                let combinedOperator = char;
-                for (let j = i + 1; j < code.length; j++) {
-                    const nextChar = code[j];
-                    const combinedTest = combinedOperator + nextChar;
-    
-                    if (this.operatorMappings[combinedTest]) {
-                        combinedOperator = combinedTest;
-                        i = j; // Move the index to the last character of the combined operator
-                    } else {
-                        break;
-                    }
-                }
-    
-                if (currentLexeme !== '') {
-                    lexemes.push(currentLexeme);
-                    currentLexeme = '';
-                }
-    
-                lexemes.push(combinedOperator);
-            } else if (this.punctuatorMappings[char] || this.wordBreakers.includes(char)) {
-                if (currentLexeme !== '') {
-                    lexemes.push(currentLexeme);
-                    currentLexeme = '';
-                }
-                if (char === '\n') {
-                    lexemes.push('\n');
-                } else if (this.punctuatorMappings[char]) {
-                    lexemes.push(char);
-                }
-            } else {
-                // Handle numeric literals (both integer and floating-point)
-                if (/[0-9]/.test(char)) {
-                    currentLexeme += char;
-    
-                    let isFloatingPoint = false;
-                    for (let j = i + 1; j < code.length; j++) {
-                        const nextChar = code[j];
-                        if (nextChar === '.' && !isFloatingPoint) {
-                            isFloatingPoint = true;
-                            currentLexeme += nextChar;
-                        } else if (/[0-9]/.test(nextChar)) {
-                            currentLexeme += nextChar;
-                        } else {
-                            break;
-                        }
-                        i = j; // Move the index to the last character of the numeric literal
-                    }
-    
-                    lexemes.push(currentLexeme);
-                    currentLexeme = '';
-                } else if (this.isVariableStart(char)) {
-                    currentLexeme += char;
-                    for (let j = i + 1; j < code.length; j++) {
-                        const nextChar = code[j];
-                        if (this.isVariablePart(nextChar)) {
-                            currentLexeme += nextChar;
-                        } else {
-                            break;
-                        }
-                        i = j; // Move the index to the last character of the variable
-                    }
-                    lexemes.push(currentLexeme);
-                    currentLexeme = '';
-                } else {
-                    currentLexeme += char;
-                }
+            if (currentLexeme !== '') {
+                lexemes.push(currentLexeme);
+                currentLexeme = '';
             }
+    
+            // ...
         }
     
         if (currentLexeme !== '') {
@@ -142,7 +98,113 @@ class WordBreaker {
     
         return lexemes;
     }
+
+    // single line commit with //
     
+
+    // splitCode(code) {
+    //     const lexemes = [];
+    //     let currentLexeme = '';
+    //     let inString = false;
+    
+    //     for (let i = 0; i < code.length; i++) {
+    //         const char = code[i];
+    
+    //         if (char === '"' && (i === 0 || code[i - 1] !== '\\')) {
+    //             inString = !inString;
+    //         }
+    
+    //         if (inString) {
+    //             currentLexeme += char;
+    //             continue;
+    //         }
+    //         if (char === '/' && code[i + 1] === '/') {
+    //             // Handle "//" comment
+    //             while (i < code.length && code[i] !== '\n') {
+    //                 i++; // Move the index to the end of the comment
+    //             }
+    //             // No need to add anything to lexemes for comments
+    //         }
+    
+    //         if (this.operatorMappings[char]) {
+    //             let combinedOperator = char;
+    //             for (let j = i + 1; j < code.length; j++) {
+    //                 const nextChar = code[j];
+    //                 const combinedTest = combinedOperator + nextChar;
+    
+    //                 if (this.operatorMappings[combinedTest]) {
+    //                     combinedOperator = combinedTest;
+    //                     i = j; // Move the index to the last character of the combined operator
+    //                 } else {
+    //                     break;
+    //                 }
+    //             }
+    
+    //             if (currentLexeme !== '') {
+    //                 lexemes.push(currentLexeme);
+    //                 currentLexeme = '';
+    //             }
+    
+    //             lexemes.push(combinedOperator);
+    //         } else if (this.punctuatorMappings[char] || this.wordBreakers.includes(char)) {
+    //             if (currentLexeme !== '') {
+    //                 lexemes.push(currentLexeme);
+    //                 currentLexeme = '';
+    //             }
+    //             if (char === '\n') {
+    //                 lexemes.push('\n');
+    //             } else if (this.punctuatorMappings[char]) {
+    //                 lexemes.push(char);
+    //             }
+    //         } else {
+    //             // Handle numeric literals (both integer and floating-point)
+    //             if (/[0-9]/.test(char)) {
+    //                 currentLexeme += char;
+    
+    //                 let isFloatingPoint = false;
+    //                 for (let j = i + 1; j < code.length; j++) {
+    //                     const nextChar = code[j];
+    //                     if (nextChar === '.' && !isFloatingPoint) {
+    //                         isFloatingPoint = true;
+    //                         currentLexeme += nextChar;
+    //                     } else if (/[0-9]/.test(nextChar)) {
+    //                         currentLexeme += nextChar;
+    //                     } else {
+    //                         break;
+    //                     }
+    //                     i = j; // Move the index to the last character of the numeric literal
+    //                 }
+    
+    //                 lexemes.push(currentLexeme);
+    //                 currentLexeme = '';
+    //             } else if (this.isVariableStart(char)) {
+    //                 currentLexeme += char;
+    //                 for (let j = i + 1; j < code.length; j++) {
+    //                     const nextChar = code[j];
+    //                     if (this.isVariablePart(nextChar)) {
+    //                         currentLexeme += nextChar;
+    //                     } else {
+    //                         break;
+    //                     }
+    //                     i = j; // Move the index to the last character of the variable
+    //                 }
+    //                 lexemes.push(currentLexeme);
+    //                 currentLexeme = '';
+    //             } else {
+    //                 currentLexeme += char;
+    //             }
+    //         }
+    //     }
+    
+    //     if (currentLexeme !== '') {
+    //         lexemes.push(currentLexeme);
+    //     }
+    
+    //     return lexemes;
+    // }
+    
+ 
+
 
     // splitCode(code) {
     //     const lexemes = [];

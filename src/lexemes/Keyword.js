@@ -22,8 +22,8 @@ class Keyword {
             'print':'PRINT',
             'end':'END',
             'create':'CREATE',
-            'true':'TRUE_FALSE',
-            'false':'TRUE_FALSE',
+            // 'true':'TRUE_FALSE',
+            // 'false':'TRUE_FALSE',
             
             
         };
