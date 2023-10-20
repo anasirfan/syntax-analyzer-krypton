@@ -22,6 +22,11 @@ class Keyword {
             'print':'PRINT',
             'end':'END',
             'create':'CREATE',
+            'try':'TRY',
+            'list':'LIST',
+            'implements':'IMPLEMENTS',
+
+
             // 'true':'TRUE_FALSE',
             // 'false':'TRUE_FALSE',
             

@@ -10,7 +10,8 @@ class Punctuator {
             "}": "CLOSING_CURLY_BRACKET",
             "[": "OPENING_SQUARE_BRACKET",
             "]": "CLOSING_SQUARE_BRACKET",
-            "->": "ARROW_POINTER"
+            "->": "ARROW_POINTER",
+            ";" : "LINE_BREAKER"
         };
     }
 

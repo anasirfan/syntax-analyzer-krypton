@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Editor from './components/Editor';
 import Lexer from '../src/lexicalAnalyzer/Lexer'; // Adjust the path accordingly
+import Parser from './lexicalAnalyzer/Parser';
 
 function App() {
     const [code, setCode] = useState('');
@@ -11,7 +12,14 @@ function App() {
     const executeCode = () => {
         const lexer = new Lexer(code);
         const parsedTokens = lexer.tokenize();
-        console.log('tokens : ', parsedTokens);
+       
+        // console.log('tokens : ', parsedTokens);
+        const parser = new Parser(parsedTokens);
+
+        const result = parser.parse();
+
+        // console.log(result);
+
 
         setTokens(parsedTokens);
 
@@ -28,6 +36,8 @@ function App() {
     const saveTokensToFile = () => {
         // Convert tokens array to JSON
         const tokensJSON = JSON.stringify(tokens, null, 2);
+
+        console.log(tokensJSON);
 
         // Create a Blob object and save it as a file
         const blob = new Blob([tokensJSON], { type: 'application/json' });

@@ -65,7 +65,7 @@ class WordBreaker {
             }
             // if (char === '/' && code[i + 1] === '/') {
             //     // Handle "//" comment
-            //     while (i < code.length && code[i] !== '\n') {
+            //     while (i < code.length && code[i] !== ';') {
             //         i++; // Move the index to the end of the comment
             //     }
             //     // No need to add anything to lexemes for comments
@@ -73,7 +73,7 @@ class WordBreaker {
 
             if (char === '/' && code[i + 1] === '/') {
                 // Handle single-line comment
-                while (i < code.length && code[i] !== '\n') {
+                while (i < code.length && code[i] !== ';') {
                     i++; // Move the index to the end of the comment
                 }
                 continue; // Skip the rest of the loop for comments
